@@ -79,27 +79,23 @@ def create_pdf(summaries):
 
 def send_email(file):
 
-    msg = EmailMessage()
-
-    msg["Subject"] = "Daily Energy Intelligence"
-    msg["From"] = EMAIL
-    msg["To"] = EMAIL
-
-    msg.set_content("Attached is today's market intelligence report.")
-
     with open(file, "rb") as f:
-        msg.add_attachment(
-            f.read(),
-            maintype="application",
-            subtype="pdf",
-            filename=file
+
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {os.environ['RESEND_API_KEY']}"
+            },
+            data={
+                "from": "Market Bot <onboarding@resend.dev>",
+                "to": os.environ["EMAIL"],
+                "subject": "Daily Market Intelligence",
+                "text": "Today's report attached"
+            },
+            files={
+                "attachments": ("report.pdf", f, "application/pdf")
+            }
         )
-
-    smtp = smtplib.SMTP_SSL("smtp.gmail.com", 587)
-    smtp.login(EMAIL, PASSWORD)
-    smtp.send_message(msg)
-    smtp.quit()
-
 
 def main():
 
