@@ -77,24 +77,51 @@ def create_pdf(summaries):
     return filename
 
 
-def send_email(file):
+def send_email(file_path):
+    print("Preparing email via Resend...")
 
-    with open(file, "rb") as f:
+    api_key = os.environ.get("RESEND_API_KEY")
+    email_to = os.environ.get("EMAIL")
 
-        response = requests.post(
-            "https://api.resend.com/emails",
-            headers={
-                "Authorization": f"Bearer {os.environ['RESEND_API_KEY']}"
-            },
-            data={
-                "from": "Market Bot <onboarding@resend.dev>",
-                "to": os.environ["EMAIL"],
-                "subject": "Daily Market Intelligence",
-                "text": "Today's report attached"
-            },
-            files={
-                "attachments": ("report.pdf", f, "application/pdf")
+    if not api_key:
+        raise ValueError("Missing RESEND_API_KEY")
+    if not email_to:
+        raise ValueError("Missing EMAIL")
+
+    with open(file_path, "rb") as f:
+        pdf_data = f.read()
+
+    attachment_base64 = base64.b64encode(pdf_data).decode("utf-8")
+
+    payload = {
+        "from": "onboarding@resend.dev",
+        "to": [email_to],
+        "subject": "Daily Market Intelligence",
+        "text": "Today's report is attached.",
+        "attachments": [
+            {
+                "filename": "report.pdf",
+                "content": attachment_base64
             }
+        ]
+    }
+
+    print("Sending request to Resend...")
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=30,
+    )
+
+    print("Resend status code:", response.status_code)
+    print("Resend response:", response.text)
+
+    response.raise_for_status()
+    print("EMAIL SENT SUCCESS") }
         )
 
 def main():
