@@ -1,10 +1,10 @@
 import os
 import requests
+import base64
 from bs4 import BeautifulSoup
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from email.message import EmailMessage
-import smtplib
 from datetime import datetime
 
 EMAIL = os.environ["EMAIL"]
