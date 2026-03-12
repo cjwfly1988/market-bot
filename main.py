@@ -121,8 +121,7 @@ def send_email(file_path):
     print("Resend response:", response.text)
 
     response.raise_for_status()
-    print("EMAIL SENT SUCCESS") }
-        )
+    print("EMAIL SENT SUCCESS")
 
 def main():
 
