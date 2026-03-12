@@ -95,7 +95,7 @@ def send_email(file):
             filename=file
         )
 
-    smtp = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    smtp = smtplib.SMTP_SSL("smtp.gmail.com", 587)
     smtp.login(EMAIL, PASSWORD)
     smtp.send_message(msg)
     smtp.quit()
